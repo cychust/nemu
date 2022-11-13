@@ -12,6 +12,7 @@ static uint32_t get_instr(Decode *s) { return s->isa.instr.val; }
   void concat(decode_op_, name)(Decode * s, Operand * op, word_t val, bool flag)
 
 static def_DopHelper(i) { op->imm = val; }
+static def_DopHelper(si) { op->simm = val; }
 
 static def_DopHelper(r) {
   bool is_write = flag;
@@ -31,9 +32,11 @@ static def_DHelper(U) {
 }
 
 static def_DHelper(J) {
-  word_t simm = (s->isa.instr.j.imm20 << 20) | (s->isa.instr.j.imm19_12 << 12) |
-              (s->isa.instr.j.imm11 << 11) | (s->isa.instr.j.imm10_1 << 1);
-  decode_op_i(s, id_src1, simm, true);
+  sword_t simm = (s->isa.instr.j.imm20 << 20) |
+                 (s->isa.instr.j.imm19_12 << 12) |
+                 (s->isa.instr.j.imm11 << 11) | (s->isa.instr.j.imm10_1 << 1);
+  simm = (s->isa.instr.j.imm20 == 0) ? simm : (simm | 2047 << 21);
+  decode_op_si(s, id_src1, simm, true);
   decode_op_r(s, id_dest, s->isa.instr.j.rd, true);
 }
 

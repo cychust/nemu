@@ -162,7 +162,7 @@ static inline def_rtl(jr, rtlreg_t* target) { s->dnpc = *target; }
 
 static inline def_rtl(jal, rtlreg_t* target, const sword_t imm) {
   *target = s->pc + 4;
-  s->dnpc = imm;
+  s->dnpc = s->pc + imm;
 }
 
 static inline def_rtl(jrelop, uint32_t relop, const rtlreg_t* src1,

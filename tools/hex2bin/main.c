@@ -1,18 +1,33 @@
 #include <stdio.h>
 #include <string.h>
 
+void hex2bin(char*);
+
 int main(int argc, char* args[]) {
-  if (argc != 2) {
+  if (argc <= 1) {
     printf("num of args is error.\n");
     return -1;
   }
 
+  for (int i = 1; i < argc; i++) {
+    /* code */
+    // printf("args[%d] = %s\n", i, args[i]);
+    hex2bin(args[i]);
+  }
+  return 0;
+}
+
+void hex2bin(char* input) {
   char hex[17], bin[65] = "";
   int i = 0;
 
-  memcpy(hex, args[1], strlen(args[1]));
+  memset(hex, 0, sizeof(hex));
+  memset(bin, 0, sizeof(bin));
+
+  memcpy(hex, input, strlen(input));
   /* Input hexadecimal number from user */
-  printf("Enter any hexadecimal number: %s\n", hex);
+  printf("--------------------------------------------------------------\n");
+  printf("  hexadecimal number: %s\n", hex);
   // gets(hex);
   int oHexLen = strlen(hex);
   if (strlen(hex) < 8) {
@@ -27,7 +42,7 @@ int main(int argc, char* args[]) {
       hex[i] = '0';
     }
   }
-  printf("after format: %s\n", hex);
+  // printf("after format: %s\n", hex);
 
   /* Extract first digit and find binary of each hex digit */
   for (i = 0; hex[i] != '\0'; i++) {
@@ -91,8 +106,8 @@ int main(int argc, char* args[]) {
     }
   }
 
-  printf("Hexademial number = %s\n", hex);
-  printf("Binary number = %s\n", bin);
+  // printf("Hexademial number = %s\n", hex);
+  // printf("Binary number = %s\n", bin);
 
   char a[8];
   char b[6];
@@ -100,6 +115,15 @@ int main(int argc, char* args[]) {
   char d[4];
   char e[6];
   char f[8];
+
+  memset(a, 0, sizeof a);
+  memset(b, 0, sizeof b);
+  memset(c, 0, sizeof c);
+  memset(d, 0, sizeof d);
+  memset(e, 0, sizeof e);
+  memset(f, 0, sizeof f);
+  
+
   memcpy(a, bin, 7);       // 31-25
   memcpy(b, bin + 7, 5);   // 24-20
   memcpy(c, bin + 12, 5);  // 19-15
@@ -107,9 +131,8 @@ int main(int argc, char* args[]) {
   memcpy(e, bin + 20, 5);  // 11-7
   memcpy(f, bin + 25, 7);  // 6-0
 
-  printf("%-10s %-10s %-10s %-10s %-10s %-10s\n", "31-25", "24-20(rs2)", "19-15(rs1)",
-         "14-12", "11-7(Rd)", "6-0");
-  printf("%-10s %-10s %-10s %-10s %-10s %-10s\n", a, b, c, d, e, f);
-
-  return 0;
+  printf("  %-10s %-10s %-10s %-10s %-10s %-10s\n", "31-25", "24-20(rs2)",
+         "19-15(rs1)", "14-12", "11-7(Rd)", "6-0");
+  printf("  %-10s %-10s %-10s %-10s %-10s %-10s\n", a, b, c, d, e, f);
+  printf("--------------------------------------------------------------\n");
 }

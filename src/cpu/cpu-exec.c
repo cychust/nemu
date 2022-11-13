@@ -55,8 +55,15 @@ static const void *g_exec_table[TOTAL_INSTR] = {
     MAP(INSTR_LIST, FILL_EXEC_TABLE)};
 
 static void fetch_decode_exec_updatepc(Decode *s) {
+  printf("\ndebug: -----\n");
+  printf("current pc: " FMT_WORD "\n", cpu.pc);
+
   fetch_decode(s, cpu.pc);
   s->EHelper(s);
+  
+  printf("instr: %x\n", s->isa.instr.val);
+  printf("debug end ----\n\n");
+  
   cpu.pc = s->dnpc;
 }
 
