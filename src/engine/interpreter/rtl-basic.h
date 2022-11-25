@@ -175,4 +175,34 @@ static inline def_rtl(auipc, rtlreg_t* dest, const sword_t imm) {
   *dest = s->pc + imm;
 }
 
+static inline def_rtl(jalr, rtlreg_t* target, const rtlreg_t* src1,
+                      const sword_t simm) {
+  *target = s->pc + 4;
+  s->dnpc = (*src1 + simm) & ~1;
+}
+
+static inline def_rtl(sltiu, rtlreg_t* target, const rtlreg_t* src1,
+                      const sword_t imm) {
+  *target = ((word_t)imm) > ((word_t)*src1) ? 1 : 0;
+  DbgPrintf("sltiu: target = %d\n", *target);
+}
+
+static inline def_rtl(slt, rtlreg_t* target, const rtlreg_t* src1,
+                      const rtlreg_t* src2) {
+  *target = interpret_relop(RELOP_LT, *src1, *src2) ? 1 : 0;
+  DbgPrintf("slt: target = %d\n", *target);
+}
+
+static inline def_rtl(sltu, rtlreg_t* target, const rtlreg_t* src1,
+                      const rtlreg_t* src2) {
+  *target = interpret_relop(RELOP_LTU, *src1, *src2) ? 1 : 0;
+  DbgPrintf("sltu: target = %d\n", *target);
+}
+
+static inline def_rtl(bran, uint32_t relop, const rtlreg_t* src1,
+                      const rtlreg_t* src2, const sword_t simm) {
+  bool is_jmp = interpret_relop(relop, *src1, *src2);
+  s->dnpc = (is_jmp) ? s->pc + simm : s->snpc;
+}
+
 #endif

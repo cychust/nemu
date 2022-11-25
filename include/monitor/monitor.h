@@ -25,7 +25,7 @@ static WP wp_pool[NR_WP] __attribute__((unused)) = {};
 word_t expr(char *e, bool *success);
 void all_wp_display();
 WP *new_wp();
-WP *get_num_of_wp(int num) ;
+WP *get_num_of_wp(int num);
 void free_wp(WP *wp);
 
 #endif

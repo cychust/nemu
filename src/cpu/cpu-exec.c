@@ -12,6 +12,8 @@
  */
 #define MAX_INSTR_TO_PRINT 10
 
+extern vaddr_t brk_pool[NR_WP];
+
 CPU_state cpu = {};
 uint64_t g_nr_guest_instr = 0;
 static uint64_t g_timer = 0;  // unit: us
@@ -55,15 +57,15 @@ static const void *g_exec_table[TOTAL_INSTR] = {
     MAP(INSTR_LIST, FILL_EXEC_TABLE)};
 
 static void fetch_decode_exec_updatepc(Decode *s) {
-  printf("\ndebug: -----\n");
-  printf("current pc: " FMT_WORD "\n", cpu.pc);
+  DbgPrintf("\ndebug: -----\n");
+  DbgPrintf("current pc: " FMT_WORD "\n", cpu.pc);
 
   fetch_decode(s, cpu.pc);
   s->EHelper(s);
-  
-  printf("instr: %x\n", s->isa.instr.val);
-  printf("debug end ----\n\n");
-  
+
+  DbgPrintf("instr: %x\n", s->isa.instr.val);
+  DbgPrintf("debug end ----\n\n");
+
   cpu.pc = s->dnpc;
 }
 
@@ -114,6 +116,17 @@ void fetch_decode(Decode *s, vaddr_t pc) {
 #endif
 }
 
+void test_brks(vaddr_t pc) {
+  DbgPrintf("test brk pc = 0x%08x\n", pc);
+  DbgPrintf("0x%08x\n", brk_pool[0]);
+  for (int i = 0; i < NR_WP; i++) {
+    if (pc == brk_pool[i]) {
+      nemu_state.state = NEMU_STOP;
+      break;
+    }
+  }
+}
+
 /* Simulate how the CPU works. */
 void cpu_exec(uint64_t n) {
   g_print_step = (n < MAX_INSTR_TO_PRINT);
@@ -135,6 +148,10 @@ void cpu_exec(uint64_t n) {
     fetch_decode_exec_updatepc(&s);
     g_nr_guest_instr++;
     trace_and_difftest(&s, cpu.pc);
+
+#ifdef DEBUG_ON
+    test_brks(cpu.pc);
+#endif
     if (nemu_state.state != NEMU_RUNNING) break;
     IFDEF(CONFIG_DEVICE, device_update());
   }

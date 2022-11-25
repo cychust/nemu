@@ -11,6 +11,8 @@
 
 static int is_batch_mode = false;
 
+vaddr_t brk_pool[NR_WP] = {};
+
 void init_regex();
 void init_wp_pool();
 
@@ -77,6 +79,25 @@ static int cmd_info(char *args) {
   }
   return 0;
 }
+
+static int cmd_b(char *args) {
+  char *arg1 = strtok(NULL, " ");
+  if (arg1 == NULL) {
+    return -1;
+  }
+  bool success;
+  word_t addr = expr(arg1, &success);
+  for (int i = 0; i < NR_WP; i++) {
+    if (0 == brk_pool[i]) {
+      brk_pool[i] = addr;
+      printf(" i = %d,break at 0x%08x\n", i, addr);
+      return 0;
+    }
+  }
+  printf("err add brk\n");
+  return 0;
+}
+
 static int cmd_x(char *args) {
   char *arg1 = strtok(NULL, " ");
   if (arg1 == NULL) {
@@ -138,6 +159,7 @@ static struct {
 } cmd_table[] = {
     {"help", "Display informations about all supported commands", cmd_help},
     {"c", "Continue the execution of the program", cmd_c},
+    {"b", "Set breakpoints", cmd_b},
     {"q", "Exit NEMU", cmd_q},
     {"si", "Single Step Execution", cmd_si},  // si [N]
     {"info", "Print reg state", cmd_info},    // info r: reg , w: watchpoint
